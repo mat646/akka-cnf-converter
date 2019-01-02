@@ -1,6 +1,6 @@
 # Scala CNF Remote Converter
 
-Example of Spray serialization usage for custom domain via remote 
+Example of Circe serialization usage for custom domain via remote 
 Akka Actors. 
 
 ## Usage
@@ -29,6 +29,8 @@ to start server. Then in another terminal
 
 ## References
 
-[CNF conversion](http://cs.jhu.edu/~jason/tutorials/convert-to-CNF)  
+[CNF conversion](http://cs.jhu.edu/~jason/tutorials/convert-to-CNF)
+
+[Circe docs](https://circe.github.io/circe/)  
 
 [Akka Remoting](https://doc.akka.io/docs/akka/2.5/remoting.html)  

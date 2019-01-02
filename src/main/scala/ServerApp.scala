@@ -25,7 +25,7 @@ class Server extends Actor with BooleanJsonProtocol {
 
       expr match {
         case Right(value) =>
-          log.info(s"Received: ${expr.toString}")
+          log.info(s"Received: ${value.toString}")
           sender ! BooleanExpression.convertToCNF(value).asJson.noSpaces
           log.info("Send back reduced expression")
         case Left(error) =>

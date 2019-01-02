@@ -34,7 +34,7 @@ trait BooleanJsonProtocol {
   val andDecoder: Decoder[And] = deriveDecoder
   val varDecoder: Decoder[Variable] = deriveDecoder
 
-  implicit val aDecoder: Decoder[BooleanExpression] =
+  implicit val exprDecoder: Decoder[BooleanExpression] =
     NonEmptyList.of(
       trueDecoder.widen[BooleanExpression],
       falseDecoder.widen[BooleanExpression],
