@@ -2,7 +2,8 @@ import akka.actor.{Actor, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import domain._
 import json.BooleanJsonProtocol
-import spray.json._
+import io.circe.syntax._
+import io.circe.parser.decode
 
 object ClientApp extends App {
 
@@ -20,11 +21,18 @@ class Client extends Actor with BooleanJsonProtocol {
   val unreducedExpr: BooleanExpression = And(Not(Variable("A")), Or(Variable("B"), And(Variable("C"), False)))
   println("Sending: " + unreducedExpr.toString)
 
-  remoteActor ! unreducedExpr.toJson
+  remoteActor ! unreducedExpr.asJson.noSpaces
 
   override def receive: Receive = {
-    case msg: JsValue =>
-      val expr = msg.convertTo[BooleanExpression]
-      println("Got message from remote: " + expr.toString)
+    case msg: String =>
+      val expr = decode[BooleanExpression](msg)
+
+      expr match {
+        case Right(value) =>
+          println("Got reduced expression from remote: " + value.toString)
+        case Left(error) =>
+          println("Got error from remote: " + error.toString)
+      }
+
   }
 }

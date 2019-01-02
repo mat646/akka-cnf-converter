@@ -11,15 +11,15 @@ case class Variable(symbol: String) extends BooleanExpression {
 }
 
 case class Not(not: BooleanExpression) extends BooleanExpression {
-  override def toString: String = "~ (" + not.toString + ") "
+  override def toString: String =  s"~ (${not.toString}) "
 }
 
 case class Or(or1: BooleanExpression, or2: BooleanExpression) extends BooleanExpression {
-  override def toString: String = " (" + or1.toString + ") v (" + or2.toString + ") "
+  override def toString: String = s" (${or1.toString}) v (${or2.toString}) "
 }
 
 case class And(and1: BooleanExpression, and2: BooleanExpression) extends BooleanExpression {
-  override def toString: String = " (" + and1.toString + ") ^ (" + and2.toString + ") "
+  override def toString: String = s" (${and1.toString}) ^ (${and2.toString}) "
 }
 
 

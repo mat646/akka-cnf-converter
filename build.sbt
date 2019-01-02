@@ -7,6 +7,13 @@ scalaVersion := "2.12.8"
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   "com.typesafe.akka" %% "akka-actor" % "2.5.19",
-  "com.typesafe.akka" %% "akka-remote" % "2.5.19",
-  "io.spray" %%  "spray-json" % "1.3.5"
+  "com.typesafe.akka" %% "akka-remote" % "2.5.19"
 )
+
+val circeVersion = "0.11.0"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)

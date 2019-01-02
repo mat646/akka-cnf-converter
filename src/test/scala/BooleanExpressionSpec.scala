@@ -1,16 +1,18 @@
 import domain._
+import io.circe.DecodingFailure
 import json.BooleanJsonProtocol
 import org.scalatest._
-import spray.json._
+import io.circe.syntax._
+import io.circe.parser.decode
 
 class BooleanExpressionSpec extends FlatSpec with Matchers with BooleanJsonProtocol {
 
   "Boolean expression" should "parse to json" in {
 
     val expr: BooleanExpression = And(Not(Variable("A")), Or(Variable("B"), True))
-    val fromExpr = expr.toJson
+    val fromExpr = expr.asJson.noSpaces
 
-    val json: JsValue = """{"and1":{"not":{"symbol":"A"}},"and2":{"or1":{"symbol":"B"},"or2":true}}""".parseJson
+    val json: String = """{"and1":{"not":{"symbol":"A"}},"and2":{"or1":{"symbol":"B"},"or2":"true"}}"""
 
     fromExpr shouldBe json
   }
@@ -19,19 +21,17 @@ class BooleanExpressionSpec extends FlatSpec with Matchers with BooleanJsonProto
 
     val expr: BooleanExpression = And(Not(Variable("A")), Or(Variable("B"), True))
 
-    val json: JsValue = """{"and1":{"not":{"symbol":"A"}},"and2":{"or1":{"symbol":"B"},"or2":true}}""".parseJson
-    val convertedJson: BooleanExpression = json.convertTo[BooleanExpression]
+    val json: String = """{"and1":{"not":{"symbol":"A"}},"and2":{"or1":{"symbol":"B"},"or2":"true"}}"""
+    val convertedJson: Either[io.circe.Error, BooleanExpression] = decode[BooleanExpression](json)
 
-    convertedJson shouldBe expr
+    convertedJson.right.get shouldBe expr
   }
 
   "Serialization exception" should "be thrown" in {
 
-    val json: JsValue = """{"and1":{"not":{"syml":"A"}},"and2":{"or1":{"symbol":"B"},"or2":true}}""".parseJson
+    val json: String = """{"and1":{"not":{"syml":"A"}},"and2":{"or1":{"symbol":"B"},"or2":true}}"""
 
-    assertThrows[SerializationException] {
-      json.convertTo[BooleanExpression]
-    }
+    decode[BooleanExpression](json).left.get shouldBe DecodingFailure("String", List())
 
   }
 
