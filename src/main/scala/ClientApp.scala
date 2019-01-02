@@ -1,9 +1,10 @@
 import akka.actor.{Actor, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import domain._
-import json.BooleanJsonProtocol
 import io.circe.syntax._
 import io.circe.parser.decode
+import json.BooleanJsonProtocol
+import akka.event.Logging
 
 object ClientApp extends App {
 
@@ -15,24 +16,26 @@ object ClientApp extends App {
 
 class Client extends Actor with BooleanJsonProtocol {
 
+  val log = Logging(context.system, this)
+
   val remoteActor: ActorSelection = context.actorSelection("akka.tcp://ServerApp@127.0.0.1:2552/user/ServerActor")
-  println("Remote server is at: " + remoteActor)
+  log.info("Remote server is at: " + remoteActor)
 
   val unreducedExpr: BooleanExpression = And(Not(Variable("A")), Or(Variable("B"), And(Variable("C"), False)))
-  println("Sending: " + unreducedExpr.toString)
+  log.info("Sending: " + unreducedExpr.toString)
 
   remoteActor ! unreducedExpr.asJson.noSpaces
 
   override def receive: Receive = {
     case msg: String =>
+
       val expr = decode[BooleanExpression](msg)
 
       expr match {
         case Right(value) =>
-          println("Got reduced expression from remote: " + value.toString)
+          log.info(s"Got reduced expression: ${value.toString}")
         case Left(error) =>
-          println("Got error from remote: " + error.toString)
+          log.warning(s"Got malformed expression: ${error.toString}")
       }
-
   }
 }

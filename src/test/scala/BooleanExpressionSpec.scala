@@ -1,4 +1,5 @@
 import domain._
+import io.circe.CursorOp.DownField
 import io.circe.DecodingFailure
 import json.BooleanJsonProtocol
 import org.scalatest._
@@ -27,12 +28,11 @@ class BooleanExpressionSpec extends FlatSpec with Matchers with BooleanJsonProto
     convertedJson.right.get shouldBe expr
   }
 
-  "Serialization exception" should "be thrown" in {
+  "Deserialization of boolean expression" should "fail" in {
 
     val json: String = """{"and1":{"not":{"syml":"A"}},"and2":{"or1":{"symbol":"B"},"or2":true}}"""
 
-    decode[BooleanExpression](json).left.get shouldBe DecodingFailure("String", List())
-
+    decode[BooleanExpression](json).left.get shouldBe DecodingFailure("Attempt to decode value on failed cursor", List(DownField("symbol")))
   }
 
   "Custom boolean expression" should "be reduced to CNF form" in {
