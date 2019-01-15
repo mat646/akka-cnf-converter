@@ -1,13 +1,10 @@
 package json
 
-import cats.data.NonEmptyList
 import cats.syntax.functor._
-import cats.syntax.reducible._
 import domain._
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto.deriveDecoder
 import io.circe.syntax._
 
 trait BooleanJsonProtocol {
@@ -29,18 +26,14 @@ trait BooleanJsonProtocol {
     case "false" => Right(False)
     case _ => Left("Invalid value: expected 'false'")
   }
-  val notDecoder: Decoder[Not] = deriveDecoder
-  val orDecoder: Decoder[Or] = deriveDecoder
-  val andDecoder: Decoder[And] = deriveDecoder
-  val varDecoder: Decoder[Variable] = deriveDecoder
 
   implicit val exprDecoder: Decoder[BooleanExpression] =
-    NonEmptyList.of(
-      trueDecoder.widen[BooleanExpression],
-      falseDecoder.widen[BooleanExpression],
-      notDecoder.widen[BooleanExpression],
-      orDecoder.widen[BooleanExpression],
-      andDecoder.widen[BooleanExpression],
-      varDecoder.widen[BooleanExpression]).reduceK
+    List[Decoder[BooleanExpression]](
+      trueDecoder.widen,
+      falseDecoder.widen,
+      Decoder[Not].widen,
+      Decoder[Or].widen,
+      Decoder[And].widen,
+      Decoder[Variable].widen).reduceLeft(_ or _)
 
 }
